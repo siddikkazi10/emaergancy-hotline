@@ -1,16 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Joruri Seba</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    
-  <h1>siddik</h1>
+<body class="bg-gray-100 font-sans">
 
+  <!-- Navbar -->
+  <header class="bg-white shadow p-4 flex justify-between items-center">
+    <div class="flex items-center gap-2">
+      
+      <img class="w-8" src="assets/logo.png" alt="">
+      <span class="font-bold text-lg">Emergency Service</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <div class="flex items-center gap-1">❤️ <span id="heartCount">0</span></div>
+      <div class="flex items-center gap-1">🪙 <span id="coinCount">100</span></div>
+      <div class="flex items-center gap-1">📄 <span id="copyCount">0</span> Copy</div>
+    </div>
+  </header>
 
-    <script src="script.js"></script>
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-r from-green-800 to-green-600 text-white text-center py-10">
+    <img class="w-8 flex mx-auto" src="assets/logo-dark.png" alt="">
+    <h2 class="text-2xl md:text-3xl font-bold">Emergency Service Directory</h2>
+    <p class="mt-2 text-sm md:text-base">Government Emergency Services at Your Fingertips – A Project by Government of the People's Republic of Bangladesh</p>
+  </section>
+
+  <!-- Main Layout -->
+  <main class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+    <!-- Cards Section -->
+    <div id="cardSection" class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+    <!-- History Section -->
+    <aside class="bg-white rounded-xl shadow p-4">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-semibold">📜 Call History</h3>
+        <button id="clearHistoryBtn" class="px-3 py-1 text-sm bg-red-100 hover:bg-red-200 rounded">Clear</button>
+      </div>
+      <ul id="historyList" class="space-y-2 text-sm"></ul>
+    </aside>
+  </main>
+
+  <script>
+    // Services Data
+    const services = [
+      {name:"National Emergency Number", number:"999", category:"National Emergency", icon:"🚨"},
+      {name:"Police Helpline Number", number:"999", category:"Police", icon:"👮"},
+      {name:"Fire Service Number", number:"999", category:"Fire service", icon:"🔥"},
+      {name:"Ambulance Service", number:"1994-999999", category:"Ambulance", icon:"🚑"},
+      {name:"Women & Child Helpline", number:"109", category:"Women & Child Helpline", icon:"👩‍👧"},
+      {name:"Anti-Corruption Helpline", number:"106", category:"Anti-Corruption", icon:"⚖️"},
+      {name:"Electricity Helpline", number:"16216", category:"Electricity Outage", icon:"💡"},
+      {name:"Brac Helpline", number:"16445", category:"Brac", icon:"🏥"},
+      {name:"Bangladesh Railway Helpline", number:"163", category:"Bangladesh Railway", icon:"🚆"},
+    ];
+
+    let heartCount = 0, coinCount = 100, copyCount = 0;
+
+    const cardSection = document.getElementById("cardSection");
+
+    // Render Cards
+    services.forEach(s => {
+      const card = document.createElement("div");
+      card.className = "bg-white rounded-xl shadow p-4 flex flex-col justify-between hover:shadow-lg transition";
+      card.innerHTML = `
+        <div class="flex justify-between items-start">
+          <div class="text-3xl">${s.icon}</div>
+          <button class="favoriteBtn">🤍</button>
+        </div>
+        <div class="mt-2">
+          <h4 class="font-bold">${s.name}</h4>
+          <p class="text-gray-500 text-sm">${s.category}</p>
+          <p class="font-semibold mt-1">${s.number}</p>
+        </div>
+        <div class="mt-3 flex gap-2">
+          <button class="copyBtn flex-1 border rounded px-2 py-1 text-sm hover:bg-gray-100" data-number="${s.number}">📄 Copy</button>
+          <button class="callBtn flex-1 bg-green-600 text-white rounded px-2 py-1 text-sm hover:bg-green-700" data-name="${s.name}" data-number="${s.number}">📞 Call</button>
+        </div>
+      `;
+      cardSection.appendChild(card);
+    });
+
+    function updateNavbar(){
+      document.getElementById("heartCount").textContent = heartCount;
+      document.getElementById("coinCount").textContent = coinCount;
+      document.getElementById("copyCount").textContent = copyCount;
+    }
+
+    function addHistory(name, number){
+      const li = document.createElement("li");
+      const now = new Date().toLocaleTimeString();
+      li.textContent = `${name} - ${number} (${now})`;
+      document.getElementById("historyList").prepend(li);
+    }
+
+    // Event Delegation
+    document.addEventListener("click", async e => {
+      if(e.target.classList.contains("favoriteBtn")){
+        heartCount++;
+        e.target.textContent = "❤️";
+        updateNavbar();
+      }
+      if(e.target.classList.contains("copyBtn")){
+        const num = e.target.dataset.number;
+        await navigator.clipboard.writeText(num);
+        copyCount++;
+        updateNavbar();
+        alert("Copied: " + num);
+      }
+      if(e.target.classList.contains("callBtn")){
+        const num = e.target.dataset.number;
+        const name = e.target.dataset.name;
+        if(coinCount < 20){
+          alert("Not enough coins!");
+          return;
+        }
+        coinCount -= 20;
+        updateNavbar();
+        alert(`Calling ${name} (${num})`);
+        addHistory(name, num);
+      }
+      if(e.target.id === "clearHistoryBtn"){
+        document.getElementById("historyList").innerHTML = "";
+      }
+    });
+
+    updateNavbar();
+  </script>
 </body>
 </html>
